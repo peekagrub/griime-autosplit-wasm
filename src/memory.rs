@@ -33,6 +33,8 @@ declare_pointers!(GUIMenuPointers {
 
 declare_pointers!(GUICheckpointOptionsMenu {
     is_active: UnityPointer<2> = UnityPointer::new("GUI_CheckpointOptionsMenu", 0, &["instance", "isActive"]),
+    currently_open_panel: UnityPointer<2> = UnityPointer::new("GUI_CheckpointOptionsMenu", 0, &["instance", "currentlyOpenPanel"]),
+    allow_menu_close: UnityPointer<3> = UnityPointer::new("GUI_CheckpointOptionsMenu", 0, &["instance", "closeMenuButton", "m_Interactable"]),
 });
 
 pub struct Memory<'a> {

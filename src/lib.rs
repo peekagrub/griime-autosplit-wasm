@@ -54,6 +54,10 @@ struct AutosplitterState {
     fade_out_time: f32,
     #[cfg(debug_assertions)]
     surrogate_active: bool,
+    #[cfg(debug_assertions)]
+    surrogate_currently_open_panel: i32,
+    #[cfg(debug_assertions)]
+    surrogate_allow_menu_close: bool,
 
     #[cfg(debug_assertions)]
     game_time_paused: bool,
@@ -73,6 +77,10 @@ impl AutosplitterState {
             fade_out_time: 0.0,
             #[cfg(debug_assertions)]
             surrogate_active: false,
+            #[cfg(debug_assertions)]
+            surrogate_currently_open_panel: -1,
+            #[cfg(debug_assertions)]
+            surrogate_allow_menu_close: false,
 
             #[cfg(debug_assertions)]
             game_time_paused: false,
@@ -130,9 +138,16 @@ fn handle_loads(state: &mut AutosplitterState, memory: &Memory) {
     let surrogate_active: bool = memory
         .deref(&memory.checkpoint_menu.is_active)
         .unwrap_or_default();
+    let surrogate_currently_open_panel: i32 = memory
+        .deref(&memory.checkpoint_menu.currently_open_panel)
+        .unwrap_or_default();
+    let surrogate_allow_menu_close: bool = memory
+        .deref(&memory.checkpoint_menu.allow_menu_close)
+        .unwrap_or_default();
 
     let game_time_paused = streaming_paused
         || fade_out_time == -1.0
+        || (surrogate_currently_open_panel == -1 && !surrogate_allow_menu_close)
         || (last_teleport_time > finish_teleport_time && !surrogate_active);
     if game_time_paused {
         asr::timer::pause_game_time();
@@ -149,6 +164,8 @@ fn handle_loads(state: &mut AutosplitterState, memory: &Memory) {
         check_state_changed!(fade_out_time, state);
 
         check_state_changed!(surrogate_active, state);
+        check_state_changed!(surrogate_currently_open_panel, state);
+        check_state_changed!(surrogate_allow_menu_close, state);
 
         check_state_changed!(game_time_paused, state);
     }
