@@ -131,6 +131,10 @@ async fn main() {
             .until_closes(async {
                 print_message("main: until_closes...");
                 let memory = Memory::wait_attach(&process).await;
+
+                print_message("main: preloading pointers...");
+                preload_unity_pointers(&memory);
+
                 print_message("main: starting loop...");
                 loop {
                     handle_loads(&mut state, &memory);
@@ -139,6 +143,33 @@ async fn main() {
             })
             .await;
     }
+}
+
+fn preload_unity_pointers(memory: &Memory) {
+    let _: bool = memory
+        .deref(&memory.level_streaming.is_level_streaming_paused)
+        .unwrap_or_default();
+    let _: bool = memory
+        .deref(&memory.level_streaming.is_teleporting)
+        .unwrap_or_default();
+
+    let _: f32 = memory
+        .deref(&memory.gui_menu.fade_out_time)
+        .unwrap_or_default();
+
+    let _: bool = memory
+        .deref(&memory.checkpoint_menu.is_active)
+        .unwrap_or_default();
+    let _: i32 = memory
+        .deref(&memory.checkpoint_menu.currently_open_panel)
+        .unwrap_or_default();
+    let _: bool = memory
+        .deref(&memory.checkpoint_menu.allow_menu_close)
+        .unwrap_or_default();
+
+    let _: Address64 = memory
+        .deref(&memory.player_controller.instance)
+        .unwrap_or_default();
 }
 
 fn handle_loads(state: &mut AutosplitterState, memory: &Memory) {
